@@ -94,7 +94,7 @@ def z3_expr(tree):
 def ex2():
     parser = lark.Lark(GRAMMAR)
 
-    tree1 = parser.parse("x * 2")
+    tree1 = parser.parse("x * 8")
     print(run(tree1, {'x': 9}))
 
     tree2 = parser.parse("x << hole")
@@ -103,6 +103,7 @@ def ex2():
 
     plain_vars = {k: v for k, v in vars1.items()
                   if not k.startswith('h')}
+
     goal = z3.ForAll(
         list(plain_vars.values()),
         expr1 == expr2,
@@ -110,6 +111,7 @@ def ex2():
 
     solver = z3.Solver()
     solver.add(goal)
+    solver.check()
     print(solver.model())
 
 
