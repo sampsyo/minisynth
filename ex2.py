@@ -62,9 +62,41 @@ def interp(tree, lookup):
         return lookup(tree.children[0])
     elif op == 'if':  # Conditional.
         cond = interp(tree.children[0], lookup)
-        lhs = interp(tree.children[1], lookup)
-        rhs = interp(tree.children[2], lookup)
-        return (cond & 1) * lhs + (1 - (cond & 1)) * rhs
+        true = interp(tree.children[1], lookup)
+        false = interp(tree.children[2], lookup)
+        return (cond & 1) * true + (1 - (cond & 1)) * false
+
+
+def pretty(tree, subst={}):
+    """Pretty-print a tree, with optional substitutions applied.
+    """
+
+    op = tree.data
+    if op in ('add', 'sub', 'mul', 'div', 'shl', 'shr'):
+        lhs = pretty(tree.children[0], subst)
+        rhs = pretty(tree.children[1], subst)
+        c = {
+            'add': '+',
+            'sub': '-',
+            'mul': '*',
+            'div': '/',
+            'shl': '<<',
+            'shr': '>>',
+        }[op]
+        return '{} {} {}'.format(lhs, c, rhs)
+    elif op == 'neg':
+        sub = pretty(tree.children[0], subst)
+        return '-{}'.format(sub)
+    elif op == 'num':
+        return tree.children[0]
+    elif op == 'var':
+        name = tree.children[0]
+        return subst.get(name, name)
+    elif op == 'if':
+        cond = pretty(tree.children[0], subst)
+        true = pretty(tree.children[1], subst)
+        false = pretty(tree.children[2], subst)
+        return '{} ? {} : {}'.format(cond, true, false)
 
 
 def run(tree, env):
@@ -109,6 +141,15 @@ def solve(phi):
     return s.model()
 
 
+def model_values(model):
+    """Get the values out of a Z3 model.
+    """
+    return {
+        d.name(): model[d]
+        for d in model.decls()
+    }
+
+
 def synthesize(tree1, tree2):
     """Given two programs, synthesize the values for holes that make
     them equal.
@@ -142,7 +183,9 @@ def ex2(source):
     tree1 = parser.parse(src1)
     tree2 = parser.parse(src2)
 
-    print(synthesize(tree1, tree2))
+    model = synthesize(tree1, tree2)
+    print(pretty(tree1))
+    print(pretty(tree2, model_values(model)))
 
 
 if __name__ == '__main__':
