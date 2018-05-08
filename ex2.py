@@ -69,15 +69,16 @@ def run(tree, env):
     return interp(tree, lambda n: env[n])
 
 
-def z3_expr(tree):
+def z3_expr(tree, vars=None):
     """Create a Z3 expression from a tree.
 
     Return the Z3 expression and a dict mapping variable names to all
     free variables occurring in the expression. All variables are
-    represented as BitVecs of width 8.
+    represented as BitVecs of width 8. Optionally, `vars` can be an
+    initial set of variables.
     """
 
-    vars = {}
+    vars = dict(vars) if vars else {}
 
     # Lazily construct a mapping from names to variables.
     def get_var(name):
@@ -101,25 +102,37 @@ def solve(phi):
     return s.model()
 
 
-def ex2():
-    parser = lark.Lark(GRAMMAR)
+def synthesize(tree1, tree2):
+    """Given two programs, synthesize the values for holes that make
+    them equal.
 
-    tree1 = parser.parse("x * 8")
-    print(run(tree1, {'x': 9}))
+    `tree1` has no holes. In `tree2`, every variable beginning with the
+    letter "h" is considered a hole.
+    """
 
-    tree2 = parser.parse("x << hole")
     expr1, vars1 = z3_expr(tree1)
-    expr2, vars2 = z3_expr(tree2)
+    expr2, vars2 = z3_expr(tree2, vars1)
 
+    # Filter out the variables starting with "h" to get the non-hole
+    # variables.
     plain_vars = {k: v for k, v in vars1.items()
                   if not k.startswith('h')}
 
+    # Formulate the constraint for Z3.
     goal = z3.ForAll(
-        list(plain_vars.values()),
-        expr1 == expr2,
+        list(plain_vars.values()),  # For every valuation of variables...
+        expr1 == expr2,  # ...the two expressions produce equal results.
     )
 
-    print(solve(goal))
+    # Solve the constraint.
+    return solve(goal)
+
+
+def ex2():
+    parser = lark.Lark(GRAMMAR)
+    tree1 = parser.parse("x * 8")
+    tree2 = parser.parse("x << hole")
+    print(synthesize(tree1, tree2))
 
 
 if __name__ == '__main__':
