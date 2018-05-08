@@ -12,14 +12,13 @@ def ex1_goal():
     return (z3.ForAll([x, y], phi_n == phi_s))
 
 
-def ex1():
-    goal = ex1_goal()
-
+def solve(phi):
     s = z3.Solver()
-    s.add(goal)
+    s.add(phi)
     s.check()
-    print(s.model())
+    return s.model()
 
 
 if __name__ == '__main__':
-    ex1()
+    goal = ex1_goal()
+    print(solve(goal))

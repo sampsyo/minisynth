@@ -91,6 +91,16 @@ def z3_expr(tree):
     return interp(tree, get_var), vars
 
 
+def solve(phi):
+    """Solve a Z3 expression, returning the model.
+    """
+
+    s = z3.Solver()
+    s.add(phi)
+    s.check()
+    return s.model()
+
+
 def ex2():
     parser = lark.Lark(GRAMMAR)
 
@@ -109,10 +119,7 @@ def ex2():
         expr1 == expr2,
     )
 
-    solver = z3.Solver()
-    solver.add(goal)
-    solver.check()
-    print(solver.model())
+    print(solve(goal))
 
 
 if __name__ == '__main__':
