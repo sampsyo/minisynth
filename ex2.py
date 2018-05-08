@@ -6,21 +6,21 @@ import sys
 # https://github.com/lark-parser/lark/wiki/Examples
 GRAMMAR = """
 ?start: sum
-  | sum "?" sum ":" -> if
+  | sum "?" sum ":" sum -> if
 
 ?sum: term
-  | sum "+" term    -> add
-  | sum "-" term    -> sub
+  | sum "+" term        -> add
+  | sum "-" term        -> sub
 
 ?term: item
-  | term "*"  item  -> mul
-  | term "/"  item  -> div
-  | term ">>" item  -> shr
-  | term "<<" item  -> shl
+  | term "*"  item      -> mul
+  | term "/"  item      -> div
+  | term ">>" item      -> shr
+  | term "<<" item      -> shl
 
-?item: NUMBER       -> num
-  | "-" item        -> neg
-  | CNAME           -> var
+?item: NUMBER           -> num
+  | "-" item            -> neg
+  | CNAME               -> var
   | "(" start ")"
 
 %import common.NUMBER
