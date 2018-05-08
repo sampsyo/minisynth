@@ -69,6 +69,9 @@ def interp(tree, lookup):
 
 def pretty(tree, subst={}, paren=False):
     """Pretty-print a tree, with optional substitutions applied.
+
+    If `paren` is true, then loose-binding expressions are
+    parenthesized. We simplify boolean expressions "on the fly."
     """
 
     # Add parentheses?
@@ -104,7 +107,14 @@ def pretty(tree, subst={}, paren=False):
         cond = pretty(tree.children[0], subst)
         true = pretty(tree.children[1], subst)
         false = pretty(tree.children[2], subst)
-        return par('{} ? {} : {}'.format(cond, true, false))
+
+        # Simplify conditions, just for fun. World's worst program optimizer.
+        if cond == '1':
+            return true
+        elif cond == '0':
+            return false
+        else:
+            return par('{} ? {} : {}'.format(cond, true, false))
 
 
 def run(tree, env):
