@@ -1,4 +1,5 @@
 import lark
+import z3
 
 # A language based on a Lark example from:
 # https://github.com/lark-parser/lark/wiki/Examples
@@ -30,6 +31,8 @@ GRAMMAR = """
 def interp(tree, lookup):
     """Evaluate the arithmetic expression.
 
+    Pass a tree as a Lark `Tree` object for the parsed expression. For
+    `lookup`, provide a function for mapping variable names to values.
     """
 
     op = tree.data
@@ -57,10 +60,29 @@ def interp(tree, lookup):
         return lookup(tree.children[0])
 
 
+def run(tree, env):
+    """Ordinary expression evaluation.
+
+    `env` is a mapping from variable names to values.
+    """
+
+    return interp(tree, lambda n: env[n])
+
+
+def z3_expr(tree):
+    """Create a Z3 expression from a tree.
+
+    All variables are represented as BitVecs of width 8.
+    """
+
+    return interp(tree, lambda n: z3.BitVec(n, 8))
+
+
 def ex2():
     parser = lark.Lark(GRAMMAR)
     tree = parser.parse("1 * 2 + (1 - x) << 1")
-    print(interp(tree, lambda _: 9))
+    print(run(tree, {'x': 9}))
+    print(z3_expr(tree))
 
 
 if __name__ == '__main__':
