@@ -19,12 +19,12 @@ GRAMMAR = """
 
 ?item: NUMBER      -> num
   | "-" item       -> neg
-  | WORD           -> var
+  | CNAME          -> var
   | "(" sum ")"
 
 %import common.NUMBER
 %import common.WS
-%import common.WORD
+%import common.CNAME
 %ignore WS
 """.strip()
 
