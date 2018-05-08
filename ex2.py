@@ -67,14 +67,22 @@ def interp(tree, lookup):
         return (cond & 1) * true + (1 - (cond & 1)) * false
 
 
-def pretty(tree, subst={}):
+def pretty(tree, subst={}, paren=False):
     """Pretty-print a tree, with optional substitutions applied.
     """
 
+    # Add parentheses?
+    if paren:
+        def par(s):
+            return '({})'.format(s)
+    else:
+        def par(s):
+            return s
+
     op = tree.data
     if op in ('add', 'sub', 'mul', 'div', 'shl', 'shr'):
-        lhs = pretty(tree.children[0], subst)
-        rhs = pretty(tree.children[1], subst)
+        lhs = pretty(tree.children[0], subst, True)
+        rhs = pretty(tree.children[1], subst, True)
         c = {
             'add': '+',
             'sub': '-',
@@ -83,10 +91,10 @@ def pretty(tree, subst={}):
             'shl': '<<',
             'shr': '>>',
         }[op]
-        return '{} {} {}'.format(lhs, c, rhs)
+        return par('{} {} {}'.format(lhs, c, rhs))
     elif op == 'neg':
         sub = pretty(tree.children[0], subst)
-        return '-{}'.format(sub)
+        return '-{}'.format(sub, True)
     elif op == 'num':
         return tree.children[0]
     elif op == 'var':
@@ -96,7 +104,7 @@ def pretty(tree, subst={}):
         cond = pretty(tree.children[0], subst)
         true = pretty(tree.children[1], subst)
         false = pretty(tree.children[2], subst)
-        return '{} ? {} : {}'.format(cond, true, false)
+        return par('{} ? {} : {}'.format(cond, true, false))
 
 
 def run(tree, env):
