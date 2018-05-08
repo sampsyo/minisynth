@@ -3,7 +3,7 @@ minsynth
 
 These are supporting materials for a lecture on program synthesis in the [Sketch][] tradition.
 
-Install Z3 with its Python 3 bindings. With Homebrew:
+Install [Z3][] with its Python 3 bindings. With Homebrew:
 
     $ brew install z3 --with-python
 
@@ -27,3 +27,4 @@ Run a more complete synthesis engine for a little arithmetic language:
 [primer]: http://barghouthi.github.io/2017/04/24/synthesis-primer/
 [aws]: http://www.cs.wisc.edu/~aws
 [sketch]: https://people.csail.mit.edu/asolar/papers/thesis.pdf
+[z3]: https://github.com/Z3Prover/z3
