@@ -1,5 +1,6 @@
 import lark
 import z3
+import sys
 
 # A language based on a Lark example from:
 # https://github.com/lark-parser/lark/wiki/Examples
@@ -128,12 +129,15 @@ def synthesize(tree1, tree2):
     return solve(goal)
 
 
-def ex2():
+def ex2(source):
+    src1, src2 = source.split('\n\n')
+
     parser = lark.Lark(GRAMMAR)
-    tree1 = parser.parse("x * 8")
-    tree2 = parser.parse("x << hole")
+    tree1 = parser.parse(src1)
+    tree2 = parser.parse(src2)
+
     print(synthesize(tree1, tree2))
 
 
 if __name__ == '__main__':
-    ex2()
+    ex2(sys.stdin.read())
