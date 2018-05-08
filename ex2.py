@@ -72,17 +72,34 @@ def run(tree, env):
 def z3_expr(tree):
     """Create a Z3 expression from a tree.
 
-    All variables are represented as BitVecs of width 8.
+    Return the Z3 expression and a dict mapping variable names to all
+    free variables occurring in the expression. All variables are
+    represented as BitVecs of width 8.
     """
 
-    return interp(tree, lambda n: z3.BitVec(n, 8))
+    vars = {}
+
+    # Lazily construct a mapping from names to variables.
+    def get_var(name):
+        if name in vars:
+            return vars[name]
+        else:
+            v = z3.BitVec(name, 8)
+            vars[name] = v
+            return v
+
+    return interp(tree, get_var), vars
 
 
 def ex2():
     parser = lark.Lark(GRAMMAR)
-    tree = parser.parse("1 * 2 + (1 - x) << 1")
-    print(run(tree, {'x': 9}))
-    print(z3_expr(tree))
+
+    tree1 = parser.parse("x * 2")
+    print(run(tree1, {'x': 9}))
+
+    tree2 = parser.parse("x << hole")
+    expr, vars = z3_expr(tree2)
+    print(expr)
 
 
 if __name__ == '__main__':
