@@ -11,6 +11,10 @@ Install our only Python dependency, [Lark][]:
 
     $ pip install --user lark-parser
 
+Witness the magic of Z3:
+
+    $ python3 ex0.py
+
 Run a simple example to see how to synthesize values, which is stolen from [Aws Albarghouthi][aws]'s [primer][]:
 
     $ python3 ex1.py
