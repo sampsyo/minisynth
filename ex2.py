@@ -98,8 +98,19 @@ def ex2():
     print(run(tree1, {'x': 9}))
 
     tree2 = parser.parse("x << hole")
-    expr, vars = z3_expr(tree2)
-    print(expr)
+    expr1, vars1 = z3_expr(tree1)
+    expr2, vars2 = z3_expr(tree2)
+
+    plain_vars = {k: v for k, v in vars1.items()
+                  if not k.startswith('h')}
+    goal = z3.ForAll(
+        list(plain_vars.values()),
+        expr1 == expr2,
+    )
+
+    solver = z3.Solver()
+    solver.add(goal)
+    print(solver.model())
 
 
 if __name__ == '__main__':
