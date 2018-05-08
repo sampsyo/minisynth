@@ -6,21 +6,22 @@ import sys
 # https://github.com/lark-parser/lark/wiki/Examples
 GRAMMAR = """
 ?start: sum
+  | sum "?" sum ":" -> if
 
 ?sum: term
-  | sum "+" term   -> add
-  | sum "-" term   -> sub
+  | sum "+" term    -> add
+  | sum "-" term    -> sub
 
 ?term: item
-  | term "*"  item -> mul
-  | term "/"  item -> div
-  | term ">>" item -> shr
-  | term "<<" item -> shl
+  | term "*"  item  -> mul
+  | term "/"  item  -> div
+  | term ">>" item  -> shr
+  | term "<<" item  -> shl
 
-?item: NUMBER      -> num
-  | "-" item       -> neg
-  | CNAME          -> var
-  | "(" sum ")"
+?item: NUMBER       -> num
+  | "-" item        -> neg
+  | CNAME           -> var
+  | "(" start ")"
 
 %import common.NUMBER
 %import common.WS
@@ -59,6 +60,11 @@ def interp(tree, lookup):
         return int(tree.children[0])
     elif op == 'var':  # Variable lookup.
         return lookup(tree.children[0])
+    elif op == 'if':  # Conditional.
+        cond = interp(tree.children[0], lookup)
+        lhs = interp(tree.children[1], lookup)
+        rhs = interp(tree.children[2], lookup)
+        return (cond & 1) * lhs + (1 - (cond & 1)) * rhs
 
 
 def run(tree, env):
