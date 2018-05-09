@@ -9,7 +9,7 @@ Install [Z3][] with its Python 3 bindings. With Homebrew:
 
 Install our only Python dependency, [Lark][]:
 
-    $ pip install --user lark-parser
+    $ pip3 install --user lark-parser
 
 Witness the magic of Z3:
 
