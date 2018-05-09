@@ -195,7 +195,7 @@ def synthesize(tree1, tree2):
 
 
 def ex2(source):
-    src1, src2 = source.split('\n\n')
+    src1, src2 = source.strip().split('\n')
 
     parser = lark.Lark(GRAMMAR)
     tree1 = parser.parse(src1)
