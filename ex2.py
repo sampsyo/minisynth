@@ -64,7 +64,7 @@ def interp(tree, lookup):
         cond = interp(tree.children[0], lookup)
         true = interp(tree.children[1], lookup)
         false = interp(tree.children[2], lookup)
-        return (cond & 1) * true + (1 - (cond & 1)) * false
+        return (cond != 0) * true + (cond == 0) * false
 
 
 def pretty(tree, subst={}, paren=False):
