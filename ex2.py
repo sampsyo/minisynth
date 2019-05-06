@@ -102,19 +102,24 @@ def pretty(tree, subst={}, paren=False):
         return tree.children[0]
     elif op == 'var':
         name = tree.children[0]
-        return subst.get(name, name)
+        return str(subst.get(name, name))
     elif op == 'if':
         cond = pretty(tree.children[0], subst)
         true = pretty(tree.children[1], subst)
         false = pretty(tree.children[2], subst)
 
         # Simplify conditions, just for fun. World's worst program optimizer.
-        if cond == '1':
-            return true
-        elif cond == '0':
-            return false
+        try:
+            val = int(cond)
+        except ValueError:
+            pass
         else:
-            return par('{} ? {} : {}'.format(cond, true, false))
+            if val:
+                return true
+            else:
+                return false
+
+        return par('{} ? {} : {}'.format(cond, true, false))
 
 
 def run(tree, env):
