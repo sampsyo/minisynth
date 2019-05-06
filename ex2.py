@@ -107,18 +107,6 @@ def pretty(tree, subst={}, paren=False):
         cond = pretty(tree.children[0], subst)
         true = pretty(tree.children[1], subst)
         false = pretty(tree.children[2], subst)
-
-        # Simplify conditions, just for fun. World's worst program optimizer.
-        try:
-            val = int(cond)
-        except ValueError:
-            pass
-        else:
-            if val:
-                return true
-            else:
-                return false
-
         return par('{} ? {} : {}'.format(cond, true, false))
 
 
